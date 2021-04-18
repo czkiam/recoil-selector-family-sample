@@ -1,25 +1,49 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {useEffect, useCallback, useState} from "react";
+import { useRecoilState } from "recoil";
+import "./App.css";
+import Weather from "./Weather";
+import { cityAtom } from "./Atoms";
+import debounce from "lodash.debounce";
 
-function App() {
+function useDebounce(callback, delay) {
+  const debouncedFn = useCallback(
+    debounce((...args) => callback(...args), delay),
+    [delay] // will recreate if delay changes
+  );
+  return debouncedFn;
+}
+
+export default function App() {
+  const [value, setValue] = useState("");
+  const [currentCity, setCurrentCity] = useRecoilState(cityAtom);
+
+  const debouncedSave = useDebounce((nextValue) => setCurrentCity(nextValue), 1000);
+
+  const handleChange = (event) => {
+    const { value: nextValue } = event.target;
+    setValue(nextValue);
+    debouncedSave(nextValue);
+  };
+
+  useEffect(() => {
+    setValue(currentCity)
+    return () => {
+      //
+    }
+  }, [])
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <p>
+        Enter City:
+        <input
+          value={value}
+          onChange={handleChange}
+        />
+      </p>
+      <React.Suspense fallback="Loading weather...">
+        <Weather />
+      </React.Suspense>
     </div>
   );
 }
-
-export default App;
