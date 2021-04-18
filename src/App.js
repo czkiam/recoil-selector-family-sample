@@ -1,4 +1,4 @@
-import React, {useEffect, useCallback, useState} from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { useRecoilState } from "recoil";
 import "./App.css";
 import Weather from "./Weather";
@@ -17,7 +17,10 @@ export default function App() {
   const [value, setValue] = useState("");
   const [currentCity, setCurrentCity] = useRecoilState(cityAtom);
 
-  const debouncedSave = useDebounce((nextValue) => setCurrentCity(nextValue), 1000);
+  const debouncedSave = useDebounce(
+    (nextValue) => setCurrentCity(nextValue),
+    1000
+  );
 
   const handleChange = (event) => {
     const { value: nextValue } = event.target;
@@ -26,20 +29,17 @@ export default function App() {
   };
 
   useEffect(() => {
-    setValue(currentCity)
+    setValue(currentCity);
     return () => {
-      //
-    }
-  }, [])
+      //component unload
+    };
+  }, []);
 
   return (
     <div className="App">
       <p>
         Enter City:
-        <input
-          value={value}
-          onChange={handleChange}
-        />
+        <input value={value} onChange={handleChange} />
       </p>
       <React.Suspense fallback="Loading weather...">
         <Weather />
